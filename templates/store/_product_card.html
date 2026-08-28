@@ -1,0 +1,22 @@
+{% load static %}
+<div class="product-card">
+  <div class="pin" aria-hidden="true"></div>
+  <a href="{{ p.get_absolute_url }}">
+    <div class="product-thumb">
+      <img src="{{ p.image.url }}" alt="{{ p.name }}" loading="lazy">
+    </div>
+  </a>
+  {% if p.discount_percent %}
+    <span class="badge">-{{ p.discount_percent }}%</span>
+  {% elif p.is_new_arrival %}
+    <span class="badge new">New</span>
+  {% endif %}
+  <div class="product-info">
+    <span class="cat">{{ p.category.name }}</span>
+    <a href="{{ p.get_absolute_url }}"><h3>{{ p.name }}</h3></a>
+    <div class="price-row">
+      <span class="price">₹{{ p.current_price|floatformat:0 }}</span>
+      {% if p.discount_price %}<span class="price-strike">₹{{ p.price|floatformat:0 }}</span>{% endif %}
+    </div>
+  </div>
+</div>

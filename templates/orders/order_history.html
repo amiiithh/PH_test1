@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}My Orders — PosterHub{% endblock %}
+{% block content %}
+<section class="section container">
+  <div class="section-head"><div><span class="eyebrow-label">Account</span><h2>My Orders</h2></div></div>
+  {% for order in orders %}
+    <div class="order-card">
+      <div class="order-card-head">
+        <strong>Order #{{ order.id }}</strong>
+        <span class="status-pill {{ order.status }}">{{ order.get_status_display }}</span>
+      </div>
+      <p>{{ order.items.count }} item(s) &middot; ₹{{ order.total_amount|floatformat:0 }} &middot; Placed {{ order.created_at|date:"d M Y, h:i A" }}</p>
+      <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-outline btn-sm">View Details</a>
+    </div>
+  {% empty %}
+    <div class="empty-state">
+      <h2>No orders yet</h2>
+      <a href="{% url 'store:category_list' %}" class="btn btn-primary">Start Shopping</a>
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}

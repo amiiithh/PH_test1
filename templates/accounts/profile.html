@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}My Profile — PosterHub{% endblock %}
+{% block content %}
+<section class="section container">
+  <div class="section-head"><div><span class="eyebrow-label">Account</span><h2>Hi, {{ user.first_name|default:user.username }}</h2></div></div>
+
+  <h3 style="text-transform:none; font-family:var(--font-body); margin-bottom:14px;">Saved Addresses</h3>
+  <div class="address-grid">
+    {% for a in addresses %}
+      <div class="address-option">
+        <strong>{{ a.full_name }}</strong> {% if a.is_default %}<span class="badge" style="position:static; display:inline-block;">Default</span>{% endif %}
+        <p style="margin:6px 0; font-size:0.85rem;">{{ a.as_text }}</p>
+        <p style="font-size:0.85rem; color:#8a8a91;">{{ a.phone }}</p>
+        <form method="post" action="{% url 'accounts:address_delete' a.id %}" style="margin-top:8px;">
+          {% csrf_token %}
+          <button type="submit" class="remove-link" style="background:none;border:none;cursor:pointer;">Remove</button>
+        </form>
+      </div>
+    {% empty %}
+      <p>No saved addresses yet — you'll add one at checkout.</p>
+    {% endfor %}
+  </div>
+
+  <h3 style="text-transform:none; font-family:var(--font-body); margin: 32px 0 14px;">Recent Orders</h3>
+  {% for order in orders %}
+    <div class="order-card">
+      <div class="order-card-head">
+        <strong>Order #{{ order.id }}</strong>
+        <span class="status-pill {{ order.status }}">{{ order.get_status_display }}</span>
+      </div>
+      <p>{{ order.items.count }} item(s) &middot; ₹{{ order.total_amount|floatformat:0 }} &middot; {{ order.created_at|date:"d M Y" }}</p>
+      <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-outline btn-sm">View Order</a>
+    </div>
+  {% empty %}
+    <p>No orders yet. <a href="{% url 'store:category_list' %}">Start shopping</a>.</p>
+  {% endfor %}
+  <a href="{% url 'orders:order_history' %}" class="view-all">See all orders &rarr;</a>
+</section>
+{% endblock %}

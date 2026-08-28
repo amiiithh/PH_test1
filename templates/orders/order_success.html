@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed — PosterHub{% endblock %}
+{% block content %}
+<section class="success-box">
+  <div class="success-icon">&#10003;</div>
+  <h2>Order Confirmed!</h2>
+  <p>Thank you — your order #{{ order.id }} has been placed and payment of ₹{{ order.total_amount|floatformat:0 }} was received.</p>
+  <p style="font-size:0.85rem; color:#8a8a91;">Payment ID: {{ order.razorpay_payment_id }}</p>
+  <div style="display:flex; gap:14px; justify-content:center; margin-top:24px;">
+    <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-primary">View Order</a>
+    <a href="{% url 'store:category_list' %}" class="btn btn-outline">Keep Shopping</a>
+  </div>
+</section>
+{% endblock %}

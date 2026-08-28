@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Your Cart — PosterHub{% endblock %}
+{% block content %}
+<section class="section container">
+  <div class="section-head"><div><span class="eyebrow-label">Step 1 of 3</span><h2>Your Cart</h2></div></div>
+
+  {% if cart and cart.items.all %}
+  <div class="cart-layout">
+    <div>
+      {% for item in cart.items.all %}
+        <div class="cart-item">
+          <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+          <div class="meta">
+            <a href="{{ item.product.get_absolute_url }}"><h3>{{ item.product.name }}</h3></a>
+            <span class="size">Size: {{ item.size }} &middot; ₹{{ item.unit_price|floatformat:0 }} each</span>
+          </div>
+          <form method="post" action="{% url 'store:cart_update' item.id %}">
+            {% csrf_token %}
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="10" class="qty-input">
+            <button type="submit" class="btn btn-outline btn-sm">Update</button>
+          </form>
+          <div class="actions" style="text-align:right;">
+            <p style="font-weight:800; margin-bottom:6px;">₹{{ item.line_total|floatformat:0 }}</p>
+            <form method="post" action="{% url 'store:cart_remove' item.id %}">
+              {% csrf_token %}
+              <button type="submit" class="remove-link" style="background:none;border:none;cursor:pointer;">Remove</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="summary-card">
+      <h3 style="text-transform:none; font-family:var(--font-body);">Order Summary</h3>
+      <div class="summary-row"><span>Subtotal ({{ cart.total_items }} items)</span><span>₹{{ cart.subtotal|floatformat:0 }}</span></div>
+      <div class="summary-row"><span>Shipping</span><span>{% if cart.subtotal >= 999 %}Free{% else %}₹49{% endif %}</span></div>
+      <div class="summary-row total"><span>Total</span><span>{% if cart.subtotal >= 999 %}₹{{ cart.subtotal|floatformat:0 }}{% else %}₹{{ cart.subtotal|add:49|floatformat:0 }}{% endif %}</span></div>
+      <a href="{% url 'orders:checkout' %}" class="btn btn-primary btn-block mt-lg">Proceed to Checkout</a>
+    </div>
+  </div>
+  {% else %}
+    <div class="empty-state">
+      <h2>Your cart is empty</h2>
+      <p>Looks like you haven't picked your posters yet.</p>
+      <a href="{% url 'store:category_list' %}" class="btn btn-primary">Start Shopping</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

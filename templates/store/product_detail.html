@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — PosterHub{% endblock %}
+{% block content %}
+
+<div class="product-detail">
+  <div class="gallery">
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" id="main-image">
+  </div>
+
+  <div>
+    <a href="{{ product.category.get_absolute_url }}" class="cat">{{ product.category.name }}</a>
+    <h1 style="text-transform:none; font-family: var(--font-body); font-size: 2rem;">{{ product.name }}</h1>
+    <p>{{ product.description|default:"A premium, fade-resistant poster print — ready to frame or pin straight to the wall." }}</p>
+
+    <div class="price-row">
+      <span class="price" id="js-price">₹{{ product.current_price|floatformat:0 }}</span>
+      {% if product.discount_price %}<span class="price-strike">₹{{ product.price|floatformat:0 }}</span>{% endif %}
+    </div>
+
+    {% if product.in_stock %}
+      <p class="stock-note">✓ In stock — ships in 2–4 days</p>
+    {% else %}
+      <p class="stock-note out">✕ Out of stock</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'store:cart_add' product.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+
+      <p style="font-weight:700; font-size:0.85rem; text-transform:uppercase; margin-bottom:8px;">Size</p>
+      <div class="size-picker" id="size-picker">
+        {% for code, label, price in sizes %}
+          <label class="size-option {% if forloop.first %}active{% endif %}" data-price="{{ price|floatformat:0 }}">
+            <input type="radio" name="size" value="{{ code }}" {% if forloop.first %}checked{% endif %}>
+            {{ code }}
+          </label>
+        {% endfor %}
+      </div>
+
+      <div class="qty-row">
+        <label for="qty" style="font-weight:700; font-size:0.85rem; text-transform:uppercase;">Qty</label>
+        <input type="number" name="quantity" id="qty" value="1" min="1" max="10" class="qty-input">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" {% if not product.in_stock %}disabled{% endif %}>
+        {% if product.in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
+      </button>
+    </form>
+
+    <p style="margin-top:20px; font-size:0.85rem; color:#8a8a91;">
+      Printed on 250 GSM matte poster paper · Rolled &amp; shipped in a rigid tube · Free shipping on orders over ₹999
+    </p>
+  </div>
+</div>
+
+{% if related %}
+<section class="section container related-strip">
+  <div class="section-head"><div><span class="eyebrow-label">You might also like</span><h2>More from {{ product.category.name }}</h2></div></div>
+  <div class="product-grid">
+    {% for p in related %}{% include "store/_product_card.html" with p=p %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<script>
+  document.querySelectorAll('#size-picker .size-option').forEach(function (opt) {
+    opt.addEventListener('click', function () {
+      document.querySelectorAll('#size-picker .size-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      document.getElementById('js-price').textContent = '₹' + opt.dataset.price;
+    });
+  });
+</script>
+{% endblock %}

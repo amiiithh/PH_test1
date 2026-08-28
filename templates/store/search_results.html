@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Search results — PosterHub{% endblock %}
+{% block content %}
+<section class="section container">
+  <div class="section-head"><div><span class="eyebrow-label">Search</span><h2>Results for "{{ query }}"</h2></div></div>
+  <div class="product-grid">
+    {% for p in page_obj %}
+      {% include "store/_product_card.html" with p=p %}
+    {% empty %}
+      <div class="empty-state">
+        <h2>No posters found</h2>
+        <p>Try a different search term.</p>
+        <a href="{% url 'store:category_list' %}" class="btn btn-primary">Browse Collections</a>
+      </div>
+    {% endfor %}
+  </div>
+  {% if page_obj.has_other_pages %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}<a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Prev</a>{% endif %}
+      <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

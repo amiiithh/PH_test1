@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}PosterHub — Posters that make a room{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="hero-eyebrow">Free shipping over ₹999</span>
+      <h1>Blank walls are a <em>missed opportunity.</em></h1>
+      <p class="hero-copy">Museum-quality poster prints for hostel rooms, PGs and first apartments — movies, cars, anime, motivation and more. Starting at just ₹149.</p>
+      <div class="hero-cta">
+        <a href="{% url 'store:category_list' %}" class="btn btn-primary">Shop All Posters</a>
+        <a href="#bestsellers" class="btn btn-outline" style="border-color:#faf7f0;color:#faf7f0;">See Bestsellers</a>
+      </div>
+    </div>
+    <div class="wall">
+      {% for p in bestsellers|slice:":4" %}
+        <img src="{{ p.image.url }}" alt="{{ p.name }}">
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="section-head">
+    <div><span class="eyebrow-label">Browse</span><h2>Shop by Collection</h2></div>
+    <a class="view-all" href="{% url 'store:category_list' %}">View all</a>
+  </div>
+  <div class="category-grid">
+    {% for c in featured_categories %}
+      <a class="category-tile" href="{{ c.get_absolute_url }}">
+        {% if c.image %}<img src="{{ c.image.url }}" alt="{{ c.name }}">{% endif %}
+        <span class="label">{{ c.name }}</span>
+      </a>
+    {% empty %}
+      <p>No collections yet — add some from the Django admin.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section container" id="bestsellers">
+  <div class="section-head">
+    <div><span class="eyebrow-label">Loved by everyone</span><h2>Bestsellers</h2></div>
+  </div>
+  <div class="product-grid">
+    {% for p in bestsellers %}
+      {% include "store/_product_card.html" with p=p %}
+    {% empty %}
+      <p>No bestsellers marked yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section container">
+  <div class="section-head">
+    <div><span class="eyebrow-label">Just dropped</span><h2>New Arrivals</h2></div>
+  </div>
+  <div class="product-grid">
+    {% for p in new_arrivals %}
+      {% include "store/_product_card.html" with p=p %}
+    {% empty %}
+      <p>No new arrivals marked yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+{% endblock %}

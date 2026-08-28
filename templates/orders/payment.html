@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Payment — PosterHub{% endblock %}
+{% block content %}
+<section class="section container text-center">
+  <div class="section-head" style="justify-content:center;"><div><span class="eyebrow-label">Step 3 of 3</span><h2>Complete Payment</h2></div></div>
+
+  <div class="form-card" style="max-width:440px; margin:0 auto;">
+    <p style="margin-bottom:6px; color:#8a8a91;">Order #{{ order.id }}</p>
+    <p class="price" style="font-size:2.2rem; margin-bottom:20px;">₹{{ order.total_amount|floatformat:0 }}</p>
+    <p style="font-size:0.85rem; color:#8a8a91; margin-bottom:24px;">
+      This store runs Razorpay in <strong>test mode</strong> — no real money is charged.
+      Use test card <code>4111 1111 1111 1111</code>, any future expiry, any CVV — or UPI id <code>success@razorpay</code>.
+    </p>
+    <button id="pay-btn" class="btn btn-primary btn-block">Pay ₹{{ order.total_amount|floatformat:0 }} Now</button>
+    <a href="{% url 'store:cart_detail' %}" class="btn btn-outline btn-block mt-lg">Cancel</a>
+  </div>
+</section>
+
+<!-- Razorpay Checkout.js -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.getElementById('pay-btn').addEventListener('click', function () {
+    var options = {
+      key: '{{ razorpay_key_id }}',
+      amount: '{{ amount_paise }}',
+      currency: '{{ currency }}',
+      name: 'PosterHub',
+      description: 'Order #{{ order.id }}',
+      order_id: '{{ razorpay_order_id }}',
+      prefill: {
+        name: '{{ customer_name|escapejs }}',
+        email: '{{ customer_email|escapejs }}',
+        contact: '{{ customer_phone|escapejs }}'
+      },
+      theme: { color: '#e8432c' },
+      callback_url: '{{ callback_url }}',
+      redirect: true
+    };
+    var rzp = new Razorpay(options);
+    rzp.on('payment.failed', function (response) {
+      alert('Payment failed: ' + response.error.description);
+    });
+    rzp.open();
+  });
+</script>
+{% endblock %}
